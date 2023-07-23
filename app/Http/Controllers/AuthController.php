@@ -73,6 +73,7 @@ class AuthController extends Controller
 
     public function Login(Request $request)
     {
+        $request->session()->forget('token');
         $tokens = $request->session()->get('token');
         if ($tokens) {
             return redirect()->route('dashboard');

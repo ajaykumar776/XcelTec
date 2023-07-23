@@ -10,7 +10,7 @@ class UserModel extends Model
 {
     protected $table = 'users';
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'user_type', 'email_verified', 'otp_verified', 'tokens'
+        'name', 'email', 'password', 'phone', 'user_type', 'email_verified', 'otp_verified', 'tokens', 'otp'
     ];
 
     protected $hidden = [
@@ -29,6 +29,15 @@ class UserModel extends Model
             $password = $email->password;
             $password_verification = Hash::check($incoming_pass, $password);
             return $password_verification ? true : false;
+        } else {
+            return false;
+        }
+    }
+    public static function EmailExist($email)
+    {
+        $email = UserModel::where('email', $email)->First();
+        if ($email) {
+            return true;
         } else {
             return false;
         }

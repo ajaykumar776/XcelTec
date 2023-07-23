@@ -3,12 +3,12 @@
 
 <head>
     <title>Xceltec</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <link href="assets/vendor/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Add custom CSS if needed -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 
 
@@ -25,13 +25,13 @@
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="#"></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Features</a>
+                        <a class="nav-link" href="#"></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
+                        <a class="nav-link" href="#"></a>
                     </li>
                 </ul>
 
