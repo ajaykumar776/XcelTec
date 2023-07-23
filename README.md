@@ -12,4 +12,3 @@ A new user can only be added by an Admin, if the user_type is User the permissio
 * Frontend: HTML, CSS, Boostrap 5,javascript
 * Backend: PHP,Laravel
 # PAGE SNAPS
-![ER  Diagram](snapshots/D.png)
