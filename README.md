@@ -11,18 +11,13 @@ A new user can only be added by an Admin, if the user_type is User the permissio
 # Technologies Used
 * Frontend: HTML, CSS, Boostrap 5,javascript
 * Backend: PHP,Laravel
-# Steps to Run 
+# Steps to Run The project
 
 Commands : 
-<ol>
-    <li>composer install</li>
-</ol>
+* composer install
+* Php artisan key:generate
+* php artisan migrate:fresh
+* php artisan db:seed
+* php artisan serve
+* php artisan optimize:clear (optional :  Laravel's cache)
 
-To clear all Laravel's cache, just run the following command:
-$ php artisan optimize:clear
-Compiled views cleared!
-Application cache cleared!
-Route cache cleared!
-Configuration cache cleared!
-Compiled services and packages files removed!
-Caches cleared successfully!
