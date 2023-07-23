@@ -4,10 +4,18 @@
 <div class="row">
     <div class="col-2"></div>
     <div class="col-md-8" style="margin-top: 100px;">
+
         <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">{{ $title }} Form</h5>
+
+            <div class="card-header d-flex justify-content-between">
+                <div>
+                    <a href="{{ route('dashboard') }}" class="">Go Back</a>
+                </div>
+                <div>
+                    <h5 class="card-title">{{ $title }} Form</h5>
+                </div>
             </div>
+
             <div class="card-body">
                 <form method="POST" action="{{ route('usersave') }}">
                     @csrf
@@ -67,7 +75,7 @@
                         </div>
                     </div>
                     <div class="mt-3">
-                        <button type="submit" class="btn btn-primary">{{$title}}</button>
+                        <button type="submit" class="btn btn-primary" style="width: 20%; float:right;">{{$title}}</button>
                     </div>
                 </form>
             </div>

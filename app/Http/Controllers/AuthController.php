@@ -73,7 +73,6 @@ class AuthController extends Controller
 
     public function Login(Request $request)
     {
-        $request->session()->forget('token');
         $tokens = $request->session()->get('token');
         if ($tokens) {
             return redirect()->route('dashboard');
@@ -84,9 +83,9 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $user = Auth::user();
-        $email = $user->email;
-        // UserModel::where('email', $email)->update(['tokens' => '']);
+        $id = Auth::user()->id;
+        $user = UserModel::find($id);
+        $user->update(['tokens' => '']);
         $request->session()->forget('token');
         Auth::logout();
         return redirect()->route('login');

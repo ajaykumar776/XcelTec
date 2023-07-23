@@ -9,6 +9,11 @@
                     <div class="">
                         UsersList
                     </div>
+                    @error('error')
+                    <div class="">
+                        <span class="text-danger">{{ $message }}</span>
+                    </div>
+                    @enderror
                     <div class="">
                         <a class="btn btn-primary" href="{{ route('register') }}">Add User</a>
                     </div>
@@ -59,25 +64,32 @@
 <script>
     // Function to handle the edit button click
     function handleEditButtonClick(userId) {
-        var userType = "{{ session('user_type') }}"; // Assuming the user type is stored in the 'user_type' session variable
+
+        var userType = "{{ session('user_type') }}";
         if (userType === 'Admin') {
-            window.location.href = '/users/edit/' + userId; // Replace '/users/' with the appropriate route for editing a user
+            window.location.href = '/users/edit/' + userId;
         } else {
             alert("You Don't have permission to edit");
         }
     }
-
+    // Function to handle the Delete button click
     function handleDeleteButtonClick(userId) {
-        var userType = "{{ session('user_type') }}"; // Assuming the user type is stored in the 'user_type' session variable
+
+        var userType = "{{ session('user_type') }}";
         if (userType === 'Admin') {
-            deleteUser(userId); // Replace '/users/' with the appropriate route for editing a user
+            var confirmDelete = confirm("Are you sure you want to delete this user?");
+            if (confirmDelete) {
+                deleteUser(userId);
+            } else {
+                return false;
+            }
         } else {
             alert("You Don't have permission to Delete");
         }
     }
 
     function deleteUser(userId) {
-        var userType = "{{ session('user_type') }}"; // Assuming the user type is stored in the 'user_type' session variable
+        var userType = "{{ session('user_type') }}";
         if (userType === 'Admin') {
             $.ajax({
                 url: '/users/delete/' + userId,
@@ -86,15 +98,15 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(data) {
-                    // Handle success response, if needed
+                    if (data.error) {
+                        alert(data.error);
+                    }
                     console.log('User deleted successfully!');
-                    // Refresh the page or update the user list, etc.
                 },
                 error: function(xhr, status, error) {
-                    // Handle error response, if needed
                     console.error(error);
                 }
-            }); // Replace '/users/' with the appropriate route for editing a user
+            });
         } else {
             alert("You Don't have permission to Delete");
         }

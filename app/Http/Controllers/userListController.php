@@ -32,7 +32,7 @@ class userListController extends Controller
         if ($allowed) {
             $title = 'Add';
             $col_pass = true;
-            return view('register', compact('title', 'col_pass'));
+            return view('users.register', compact('title', 'col_pass'));
         } else {
             return view('error');
         }
@@ -47,7 +47,7 @@ class userListController extends Controller
             $data = UserModel::find($id);
             $title = 'Edit';
             $col_pass = false;
-            return view('register', compact('data', 'title', 'col_pass'));
+            return view('users.register', compact('data', 'title', 'col_pass'));
         } else {
             return view('error');
         }
@@ -93,9 +93,12 @@ class userListController extends Controller
 
     public function destroy($id)
     {
+        $user_id  = Auth::user()->id;
+        if ($user_id == $id) {
+            return response()->json(['error' => 'User Cannot Delete yourSelf']);
+        }
         $user = UserModel::findOrFail($id);
         $user->delete();
-        // Return a response (optional, depending on your requirements)
         return response()->json(['message' => 'User deleted successfully']);
     }
 
