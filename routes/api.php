@@ -19,6 +19,4 @@ use App\Http\Controllers\userListController;
 
 // Protected route - requires authentication
 Route::middleware('auth:api')->group(function () {
-    Route::get('/userList', [userListController::class, 'userList']);
-    Route::post('/register', [AuthController::class, 'register']);
 });
