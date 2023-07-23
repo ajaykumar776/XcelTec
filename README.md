@@ -22,6 +22,7 @@ A new user can only be added by an Admin, if the user_type is User the permissio
 Commands : 
 * composer install
 * Php artisan key:generate
+* cp .env.example .env
 * php artisan migrate:fresh
 * php artisan db:seed
 * php artisan serve
