@@ -16,6 +16,7 @@ A new user can only be added by an Admin, if the user_type is User the permissio
 # Technologies Used
 * Frontend: HTML, CSS, Bootstrap 5, javascript
 * Backend: PHP, Laravel
+* Database: Mysql
 # Steps to Run The project
 
 Commands : 
