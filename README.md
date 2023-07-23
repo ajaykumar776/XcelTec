@@ -7,3 +7,9 @@ As soon as a user is logged, in it's user_type is checked . If user_type turns o
 
 ### Register User:
 A new user can only be added by an Admin, if the user_type is User the permission for this operation isn't allowed. 
+
+# Technologies Used
+* Frontend: HTML, CSS, Boostrap 5,javascript
+* Backend: PHP,Laravel
+# DATABASE DESIGN
+![ER  Diagram](snapshots/D.png)
