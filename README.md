@@ -28,7 +28,7 @@ Commands :
 * php artisan serve
 * php artisan optimize:clear (optional :  Laravel's cache)
 # Login Credentials 
-Email :  Admin@gmail.com
+Email :  admin@gmail.com
 Password : 123456
   
 
