@@ -27,4 +27,8 @@ Commands :
 * php artisan db:seed
 * php artisan serve
 * php artisan optimize:clear (optional :  Laravel's cache)
+# Login Credentials 
+Email :  Admin@gmail.com
+Password : 123456
+  
 
