@@ -27,9 +27,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/verification', [userListController::class, 'OtpVerification'])->name('otpverification');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });
-Route::get('/login', [AuthController::class, 'Login'])->name('login');
-Route::get('', [AuthController::class, 'Login'])->name('login');
+
+Route::match(['get'], '/{login?}', [AuthController::class, 'Login'])->name('login');
 Route::post('/login/save', [AuthController::class, 'LoginSave'])->name('loginsave');
-// states and country api 
-// Route::get('/getStates/{countryCode}', [CountryController::class, 'getStates']);
-// Route::get('/getCities/{countryCode}/{stateCode}', [CountryController::class, 'getCities']);

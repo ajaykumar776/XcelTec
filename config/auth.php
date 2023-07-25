@@ -45,6 +45,8 @@ return [
             'driver' => 'token',
             'provider' => 'users',
             'hash' => false,
+            'storage_key' => 'tokens', // Update this from 'api_token' to 'token'
+
         ],
     ],
 

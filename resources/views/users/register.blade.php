@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
     <div class="col-2"></div>
-    <div class="col-md-8" style="margin-top: 100px;">
+    <div class="col-md-8" style="margin-top: 10px;">
 
         <div class="card">
 
@@ -74,6 +74,44 @@
                             @enderror
                         </div>
                     </div>
+                    <div class="row justify-content mt-5">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    Address Form
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="country">Country</label>
+                                        <select class="form-control" id="country" name="country_id">
+                                            <option value="">Select Country</option>
+                                            <!-- Populate country dropdown dynamically -->
+                                            @foreach ($countries as $country)
+                                            <option value="{{ $country['id'] }}" @if(old('country_id')==$country['id']) selected @endif>
+                                                {{ $country['name'] }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="state">State</label>
+                                        <select class="form-control" id="state" disabled name="state_id">
+                                            <option value="">Select State</option>
+                                            <!-- States will be populated dynamically based on selected country -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <select class="form-control" id="city" disabled name="city_id">
+                                            <option value="">Select City</option>
+                                            <!-- Cities will be populated dynamically based on selected state -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="mt-3">
                         <button type="submit" class="btn btn-primary" style="width: 20%; float:right;">{{$title}}</button>
                     </div>
@@ -82,5 +120,4 @@
         </div>
     </div>
 </div>
-
 @endsection

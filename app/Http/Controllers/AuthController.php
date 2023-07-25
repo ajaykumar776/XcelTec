@@ -10,28 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
-    {
-        // Validation rules for registration
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $email_otp = rand(100000, 999999);
-        $mobile_otp = rand(100000, 999999);
-
-        // Send the OTP to the user's email for verification
-        $this->sendOtpEmail($request->email, $email_otp);
-        $this->sendOtpSms($request->phone, $mobile_otp);
-
-        // Check if validation fails
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-    }
-
     public function loginSave(Request $request)
     {
         $email = $request->input('email');
@@ -49,7 +27,7 @@ class AuthController extends Controller
                 if (Auth::attempt(['email' => $email, 'password' => $pass])) {
                     $user = Auth::user();
                     $auth_type = $user->user_type;
-                    $token = Str::random(20);
+                    $token = Str::random(200);
                     UserModel::where('email', $email)->update(['tokens' => $token]);
                     $request->session()->put('token', $token);
                     $request->session()->put('user_type', $auth_type);
@@ -70,6 +48,42 @@ class AuthController extends Controller
         }
     }
 
+    public function APILogin(Request $request)
+    {
+        $email = $request->input('email');
+        $pass = $request->input('pass');
+
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'pass' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            return response()->json(['message' => $errors->first()], 422);
+        }
+
+        $check = UserModel::verifyEmailPass($email, $pass);
+        if (!$check) {
+            return response()->json(['message' => 'Invalid email or password'], 401);
+        }
+
+        if (Auth::attempt(['email' => $email, 'password' => $pass])) {
+            $user = Auth::user();
+            $auth_type = $user->user_type;
+            $token = Str::random(200);
+            UserModel::where('email', $email)->update(['tokens' => $token]);
+            return response()->json([
+                'message' => 'Login successful',
+                'token' => $token,
+                'user_type' => $auth_type,
+            ], 200);
+        }
+
+        return response()->json(['message' => 'Authentication failed. Please check your credentials.'], 401);
+    }
+
+
 
     public function Login(Request $request)
     {
@@ -88,6 +102,7 @@ class AuthController extends Controller
         $user->update(['tokens' => '']);
         $request->session()->forget('token');
         Auth::logout();
+        $request->session()->forget('token');
         return redirect()->route('login');
     }
 }

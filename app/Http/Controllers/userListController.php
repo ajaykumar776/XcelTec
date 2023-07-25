@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Mail;
+use App\Helpers\Common;
 use App\UserModel;
 use App\Mail\OTPMail;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Notifications\VerifyEmail;
 
 class userListController extends Controller
 {
@@ -28,17 +30,36 @@ class userListController extends Controller
     public function create()
     {
 
+        $countries = Common::getAllCountries();
         $allowed = (Auth::user()->user_type == 'Admin') ? true : false;
         if ($allowed) {
             $title = 'Add';
             $col_pass = true;
-            return view('users.register', compact('title', 'col_pass'));
+            return view('users.register', compact('title', 'col_pass', 'countries'));
         } else {
             return view('error');
         }
     }
 
+    public function getAllStates($country_id)
+    {
 
+        $states = Common::getStates($country_id);
+        if ($states) {
+            return response()->json(['states' => $states], 200);
+        } else {
+            return response()->json(['states' => []], 200);
+        }
+    }
+    public function getAllCities($state_id)
+    {
+        $cities = Common::getCities($state_id);
+        if ($cities) {
+            return response()->json(['cities' => $cities], 200);
+        } else {
+            return response()->json(['cities' => []], 200);
+        }
+    }
     public function edit($id)
     {
 
@@ -62,6 +83,9 @@ class userListController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user_id,
                 'user_type' => 'required',
+                'country_id' => 'required',
+                'state_id' => 'required',
+                'city_id' => 'required'
             ]);
         } else {
             $validatedData = $request->validate([
@@ -70,6 +94,9 @@ class userListController extends Controller
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user_id,
                 'password' => 'required|string|min:6|max:10',
                 'user_type' => 'required',
+                'country_id' => 'required',
+                'state_id' => 'required',
+                'city_id' => 'required'
             ]);
         }
 
@@ -89,6 +116,53 @@ class userListController extends Controller
         }
         // Redirect to the user list page or wherever you want after successful user creation/update
         return redirect('/users')->with('success', 'User created/updated successfully!');
+    }
+
+    public function StoreSave(Request $request)
+    {
+        $user_id = $request->input('user_id');
+
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user_id,
+            'user_type' => 'required',
+            'phone' => 'required|string|max:10|unique:users,phone,' . $user_id,
+            'country_id' => 'required',
+            'state_id' => 'required',
+            'city_id' => 'required'
+        ];
+
+        if (!$user_id) {
+            $rules['password'] = 'required|string|min:6|max:10';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            return response()->json(['message' => $errors->first()], 422);
+        }
+
+        if ($user_id) {
+            $user = UserModel::find($user_id);
+            if ($user) {
+                $user->update($request->all());
+            } else {
+                return response()->json(['message' => 'User not found'], 404);
+            }
+        } else {
+            $inputData = $request->all();
+            $inputData['password'] = bcrypt($inputData['password']);
+            $otp = mt_rand(100000, 999999);
+            $inputData['otp'] = $otp;
+            $user = UserModel::create($inputData);
+        }
+        if ($user) {
+            $message = $user_id ? ' User updated successfully' : 'User created successfully';
+            return response()->json(['message' => $message, 'user' => $user], 200);
+        } else {
+            return response()->json(['Error' => 'Something Went Wrong with Inserting', 'user' => $user], 400);
+        }
     }
 
     public function destroy($id)
@@ -121,6 +195,28 @@ class userListController extends Controller
         } else {
             $user->update(['otp_verified' => true]);
             return redirect()->back()->withErrors(['verified' => '! Successfully Verified']);
+        }
+    }
+
+
+    public function OtpVerificationByApi(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'otp' => 'required|string|min:6|max:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $otp = $request->otp;
+        $user = UserModel::where('otp', $otp)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Invalid OTP'], 404);
+        } else {
+            $user->update(['otp_verified' => true]);
+            return response()->json(['message' => 'Successfully Verified'], 200);
         }
     }
 }

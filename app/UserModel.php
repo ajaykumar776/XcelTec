@@ -10,7 +10,8 @@ class UserModel extends Model
 {
     protected $table = 'users';
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'user_type', 'email_verified', 'otp_verified', 'tokens', 'otp'
+        'name', 'email', 'password', 'phone', 'user_type', 'email_verified', 'otp_verified', 'tokens', 'otp',
+        'country_id', 'state_id', 'city_id'
     ];
 
     protected $hidden = [

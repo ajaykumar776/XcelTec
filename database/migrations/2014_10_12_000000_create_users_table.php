@@ -21,11 +21,17 @@ class CreateUsersTable extends Migration
             $table->string('phone')->unique();
             $table->string('otp')->nullable();
             $table->enum('user_type', ['Admin', 'User'])->default('Admin');
-            $table->boolean('email_verified')->default(false); // Add the 'email_verified' column
-            $table->boolean('otp_verified')->default(false);   // Add the 'otp_verified' column
+            $table->boolean('email_verified')->default(false);
+            $table->boolean('otp_verified')->default(false);
             $table->string('tokens')->nullable();
             $table->unsignedBigInteger('address_id')->nullable();
             $table->boolean('is_deleted')->default(false);
+
+            // Add the new columns for country, state, and city IDs
+            $table->unsignedBigInteger('country_id')->nullable();
+            $table->unsignedBigInteger('state_id')->nullable();
+            $table->unsignedBigInteger('city_id')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });
