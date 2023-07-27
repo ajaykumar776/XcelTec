@@ -6,7 +6,7 @@ namespace App\Helpers;
 class Common
 {
     // Function to get a list of states for a given country
-    public static function getCities($state_id)
+    public static function getCities($state_id = null)
     {
         $cities = [
             // Cities in Andhra Pradesh
@@ -67,14 +67,17 @@ class Common
             ['id' => 38, 'name' => 'Gandhinagar', 'state_id' => 14],
         ];
 
-        $filteredcities = array_filter($cities, function ($state) use ($state_id) {
-            return $state['state_id'] == $state_id;
-        });
-        return  array_values($filteredcities);
+        if ($state_id) {
+            $filteredcities = array_filter($cities, function ($state) use ($state_id) {
+                return $state['state_id'] == $state_id;
+            });
+            return  array_values($filteredcities);
+        }
+        return $cities;
     }
 
     // Function to get a list of cities for a given state
-    public static function getStates($country_id)
+    public static function getStates($country_id = null)
     {
 
         $states = [
@@ -111,11 +114,16 @@ class Common
             ['id' => 25, 'name' => 'Manitoba', 'country_id' => 4], // Manitoba, Canada
         ];
 
-        $filteredStates = array_filter($states, function ($state) use ($country_id) {
-            return $state['country_id'] == $country_id;
-        });
-        $filteredStates = array_values($filteredStates);
-        return $filteredStates;
+        if ($country_id) {
+
+            $filteredStates = array_filter($states, function ($state) use ($country_id) {
+                return $state['country_id'] == $country_id;
+            });
+            $filteredStates = array_values($filteredStates);
+            return $filteredStates;
+        }
+
+        return $states;
     }
 
     // Function to get a list of all countries

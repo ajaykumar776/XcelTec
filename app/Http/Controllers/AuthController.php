@@ -50,6 +50,12 @@ class AuthController extends Controller
 
     public function APILogin(Request $request)
     {
+
+        // $token = Auth::user()->token ?? '';
+
+        // if ($token) {
+        //     return response()->json(['message' => 'You have Already LoggedIn'], 200);
+        // }
         $email = $request->input('email');
         $pass = $request->input('pass');
 
@@ -67,11 +73,10 @@ class AuthController extends Controller
         if (!$check) {
             return response()->json(['message' => 'Invalid email or password'], 401);
         }
-
+        $token = Str::random(200);
         if (Auth::attempt(['email' => $email, 'password' => $pass])) {
             $user = Auth::user();
             $auth_type = $user->user_type;
-            $token = Str::random(200);
             UserModel::where('email', $email)->update(['tokens' => $token]);
             return response()->json([
                 'message' => 'Login successful',

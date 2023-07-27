@@ -101,6 +101,7 @@
                     if (data.error) {
                         alert(data.error);
                     }
+                    window.reload();
                     console.log('User deleted successfully!');
                 },
                 error: function(xhr, status, error) {

@@ -68,4 +68,9 @@ class UserModel extends Model
 
         return false;
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class, 'user_id');
+    }
 }

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Address as AppAddress;
 use App\Helpers\Common;
 use App\UserModel;
 use App\Mail\OTPMail;
+use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -31,11 +33,14 @@ class userListController extends Controller
     {
 
         $countries = Common::getAllCountries();
+        $states = Common::getStates();
+        $cities = Common::getCities();
+        $addresses = [];
         $allowed = (Auth::user()->user_type == 'Admin') ? true : false;
         if ($allowed) {
             $title = 'Add';
             $col_pass = true;
-            return view('users.register', compact('title', 'col_pass', 'countries'));
+            return view('users.register', compact('title', 'col_pass', 'countries', 'states', 'cities', 'addresses'));
         } else {
             return view('error');
         }
@@ -45,6 +50,8 @@ class userListController extends Controller
     {
 
         $states = Common::getStates($country_id);
+        // echo json_encode($states);
+        // die;
         if ($states) {
             return response()->json(['states' => $states], 200);
         } else {
@@ -65,10 +72,22 @@ class userListController extends Controller
 
         $allowed = (Auth::user()->user_type == 'Admin') ? true : false;
         if ($allowed) {
-            $data = UserModel::find($id);
+            // $data = UserModel::with('addresses')->find($id);
             $title = 'Edit';
             $col_pass = false;
-            return view('users.register', compact('data', 'title', 'col_pass'));
+            $countries = Common::getAllCountries();
+            $states = Common::getStates();
+            $cities = Common::getCities();
+            $data = UserModel::findOrFail($id);
+            $addresses = $data->addresses->map(function ($address) {
+                return [
+                    'city' => $address->city,
+                    'state' => $address->state,
+                    'country' => $address->country,
+                ];
+            });
+
+            return view('users.register', compact('data', 'title', 'col_pass', 'countries', 'cities', 'states', 'addresses'));
         } else {
             return view('error');
         }
@@ -76,6 +95,8 @@ class userListController extends Controller
 
     public function store(Request $request)
     {
+
+
         $user_id = $request->user_id;
         if ($user_id) {
             $validatedData = $request->validate([
@@ -83,20 +104,14 @@ class userListController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user_id,
                 'user_type' => 'required',
-                'country_id' => 'required',
-                'state_id' => 'required',
-                'city_id' => 'required'
             ]);
         } else {
             $validatedData = $request->validate([
-                'phone' => 'required|string|max:10|unique:users,phone,' . $user_id,
+                'phone' => 'required|string|max:10|unique:users,phone',
                 'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,' . $user_id,
+                'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:6|max:10',
                 'user_type' => 'required',
-                'country_id' => 'required',
-                'state_id' => 'required',
-                'city_id' => 'required'
             ]);
         }
 
@@ -104,6 +119,24 @@ class userListController extends Controller
             $user = UserModel::find($user_id);
             if ($user) {
                 $user->update($validatedData);
+                AppAddress::where('user_id', $user_id)->delete();
+                $countries = $request->input('country_id');
+                $states = $request->input('state_id');
+                $cities = $request->input('city_id');
+
+                // echo json_encode($countries);
+                // die;
+
+                if (is_array($countries) && is_array($states) && is_array($cities)) {
+                    foreach ($countries as $index => $countryId) {
+                        $address = new AppAddress();
+                        $address->country = $countryId;
+                        $address->state = $states[$index];
+                        $address->city = $cities[$index];
+                        $address->user_id = $user->id;
+                        $address->save();
+                    }
+                }
             }
         } else {
             $validatedData['password'] = bcrypt($validatedData['password']);
@@ -111,6 +144,20 @@ class userListController extends Controller
             $otp = mt_rand(100000, 999999);
             $validatedData['otp'] = $otp;
             $user = UserModel::create($validatedData);
+            $countries = $request->input('country_id');
+            $states = $request->input('state_id');
+            $cities = $request->input('city_id');
+
+            if (is_array($countries) && is_array($states) && is_array($cities)) {
+                foreach ($countries as $index => $countryId) {
+                    $address = new AppAddress();
+                    $address->country = $countryId;
+                    $address->state = $states[$index];
+                    $address->city = $cities[$index];
+                    $address->user_id = $user->id;
+                    $address->save();
+                }
+            }
             $request->session()->put('otp', $otp);
             return redirect('/user/otp/verification');
         }
@@ -215,6 +262,15 @@ class userListController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Invalid OTP'], 404);
         } else {
+            if ($user->otp_verified) {
+                return response()->json(
+                    [
+                        'message' => 'Already Verified for this Email',
+                        'email' => $user->email
+                    ],
+                    200
+                );
+            }
             $user->update(['otp_verified' => true]);
             return response()->json(['message' => 'Successfully Verified'], 200);
         }

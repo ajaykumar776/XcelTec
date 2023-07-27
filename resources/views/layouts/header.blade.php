@@ -35,7 +35,7 @@
                     </li>
                 </ul>
 
-                <a class="btn btn-danger text-white" href="{{ route('logout') }}">Logout</a>
+                <a class="btn btn-danger text-white" style="border-radius: 0%; background:red;border:none" href="{{ route('logout') }}">Logout</a>
             </div>
         </div>
         @endif
