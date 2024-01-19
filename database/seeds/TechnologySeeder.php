@@ -14,8 +14,6 @@ class TechnologySeeder extends Seeder
      */
     public function run()
     {
-
-
         try {
             $programmingLanguages = [
                 'JavaScript',
@@ -40,27 +38,36 @@ class TechnologySeeder extends Seeder
                 'Shell Scripting'
             ];
 
-            $dummytec = [];
-
             foreach ($programmingLanguages as $language) {
-                try {
-                    // Try to insert the record
-                    Technology::create([
-                        'name' => $language,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                } catch (QueryException $e) {
-                    // Log duplicate entry error and continue to the next iteration
-                    if ($e->errorInfo[1] == 1062) { // MySQL error code for duplicate entry
-                        Log::warning("Skipped duplicate entry for language: $language");
-                    } else {
-                        Log::error($e->getMessage());
-                    }
-                }
+                $this->insertOrUpdateTechnology($language);
             }
         } catch (Exception $e) {
             Log::error($e->getMessage());
+        }
+    }
+
+    /**
+     * Insert or update a technology record.
+     *
+     * @param string $language
+     * @return void
+     */
+    private function insertOrUpdateTechnology($language)
+    {
+        try {
+            // Try to insert the record
+            Technology::create([
+                'name' => $language,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (QueryException $e) {
+            // Log duplicate entry error and continue to the next iteration
+            if ($e->errorInfo[1] == 1062) { // MySQL error code for duplicate entry
+                Log::warning("Skipped duplicate entry for language: $language");
+            } else {
+                Log::error($e->getMessage());
+            }
         }
     }
 }

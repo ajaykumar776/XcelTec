@@ -1,11 +1,15 @@
 <?php
 
 use App\User;
-use App\UserModel;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
 
 class UserSeeder extends Seeder
 {
+    const INDIAN_MOBILE_PREFIX = '789';
+    const DOMAIN = 'example.com';
+    const NAME_LENGTH = 5;
+
     /**
      * Run the database seeds.
      *
@@ -13,18 +17,19 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        try {
+        $faker = Faker::create();
 
+        try {
             $dummyData = [];
             for ($i = 1; $i <= 50; $i++) {
                 $dummyData[] = [
-                    'first_name' => $this->generateRandomName(),
-                    'last_name' => $this->generateRandomName(),
-                    'email' => $this->generateRandomEmail(),
-                    'password' => bcrypt(rand(1, 10)),
+                    'first_name' => $faker->name,
+                    'last_name' => $faker->name,
+                    'email' => $faker->unique()->safeEmail,
+                    'password' => bcrypt($faker->randomDigit),
                     'phone' => $this->generateRandomIndianPhoneNumber(),
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s'),
+                    'created_at' => $faker->dateTimeThisDecade()->format('Y-m-d H:i:s'),
+                    'updated_at' => $faker->dateTimeThisDecade()->format('Y-m-d H:i:s'),
                 ];
             }
             User::insert($dummyData);
@@ -32,35 +37,16 @@ class UserSeeder extends Seeder
             dd($e->getMessage());
         }
     }
+
     /**
-     * Generate a random name of length 5.
+     * Generate a random Indian phone number.
      *
      * @return string
      */
-    private function generateRandomName()
-    {
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-        $name = '';
-
-        for ($i = 0; $i < 5; $i++) {
-            $name .= $characters[rand(0, strlen($characters) - 1)];
-        }
-
-        return $name;
-    }
     private function generateRandomIndianPhoneNumber()
     {
-        $prefix = '789'; // Starting digit for Indian mobile numbers
-        $randomNumber = mt_rand(100000000, 999999999); // Generate 9 random digits
+        $randomNumber = mt_rand(100000000, 999999999);
 
-        return $prefix . $randomNumber;
-    }
-    private function generateRandomEmail()
-    {
-        $username = $this->generateRandomName(); // You can adjust the length as needed
-        $domain = 'example.com'; // Change the domain if needed
-        $email = $username . '@' . $domain;
-
-        return $email;
+        return self::INDIAN_MOBILE_PREFIX . $randomNumber;
     }
 }

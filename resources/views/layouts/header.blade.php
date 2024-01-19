@@ -10,7 +10,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
+    <style>
+        .active {
+            color: blue !important;
+        }
+    </style>
 </head>
 
 
@@ -37,15 +41,22 @@
                 @if (session('user_type')=="admin")
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('dashboard') }}">UserList</a>
+                        <a class="nav-link{{ request()->routeIs('dashboard') ? ' active' : '' }}" href="{{ route('dashboard') }}">UserList</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('registration') }}">Registration Report</a>
+                        <a class="nav-link{{ request()->routeIs('registration') ? ' active' : '' }}" href="{{ route('registration') }}">Registration Report</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('technology') }}">Technology Report</a>
+                        <a class="nav-link{{ request()->routeIs('technology') ? ' active' : '' }}" href="{{ route('technology') }}">Technology Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link{{ request()->routeIs('technologies.index') ? ' active' : '' }}" href="{{ route('technologies.index') }}">Go to Technologies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link{{ request()->routeIs('map') ? ' active' : '' }}" href="{{ route('map') }}">Map Report</a>
                     </li>
                 </ul>
+
                 @endif
                 <div class="ms-auto">
                     @if (session('user_type')=="user")

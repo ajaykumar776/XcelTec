@@ -2,8 +2,6 @@
 
 namespace App;
 
-use App\Hereabout;
-use App\Technology;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -11,17 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 class User extends Model
 {
     protected $table = 'users';
-    protected $fillable = [
-        'first_name', 'last_name', 'email', 'password', 'phone', 'map_details'
-    ];
-    protected $hidden = [
-        'password',
-    ];
+    protected $appends = ['full_name'];
+    protected $fillable = ['first_name', 'last_name', 'email', 'password', 'phone', 'map_details'];
+    protected $hidden = ['password'];
 
     public function technologies()
     {
         return $this->belongsToMany(Technology::class, 'user_technologies');
     }
+
     public function sources()
     {
         return $this->belongsToMany(Source::class, 'user_sources', 'user_id', 'source_id');
@@ -29,36 +25,29 @@ class User extends Model
 
     public static function getAllUsers()
     {
-        return User::all();
+        return self::all();
     }
+
     public static function getUserByEmailId($email)
     {
-        return User::where('email', $email)->first();
+        return self::where('email', $email)->first();
     }
+
     public static function verifyEmailPass($email, $incoming_pass)
     {
         if ($email == "admin@gmail.com") {
-            $results = DB::table('admins')
-                ->select('email', 'password',)
+            $admin = DB::table('admins')
+                ->select('email', 'password')
                 ->where('email', 'admin@gmail.com')
-                ->get()[0];
-            if ($results) {
-                $password = $results->password;
-                $password_verification = Hash::check($incoming_pass, $password);
-                return $password_verification ? true : false;
-            }
+                ->first();
+
+            return $admin && Hash::check($incoming_pass, $admin->password);
         } else {
-            $email = User::where('email', $email)->First();
-            if ($email) {
-                $password = $email->password;
-                $password_verification = Hash::check($incoming_pass, $password);
-                return $password_verification ? true : false;
-            } else {
-                return false;
-            }
+            $user = self::where('email', $email)->first();
+            return $user && Hash::check($incoming_pass, $user->password);
         }
     }
-    // Custom function to update a user
+
     public static function updateUser($id, $data)
     {
         $user = self::find($id);
@@ -70,16 +59,13 @@ class User extends Model
         return null;
     }
 
-    // Custom function to delete a user
-    public static function deleteUser($id)
+    public function setFullNameAttribute()
     {
-        $user = self::find($id);
+        $this->attributes['full_name'] = $this->attributes['first_name'] . ' ' . $this->attributes['last_name'];
+    }
 
-        if ($user) {
-            $user->delete();
-            return true;
-        }
-
-        return false;
+    public function getFullNameAttribute()
+    {
+        return $this->attributes['first_name'] . ' ' . $this->attributes['last_name'];
     }
 }

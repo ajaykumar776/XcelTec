@@ -56,7 +56,7 @@ $addresses = $addresses ?? null;
                 </div>
             </div>
 
-            <div class="card-body">
+            <div class="container">
                 <form method="POST" action="{{ route('usersave') }}" id="UserForm">
                     @csrf
                     <div class="row">
@@ -161,9 +161,6 @@ $addresses = $addresses ?? null;
     </div>
 </div>
 <script>
-    $(document).ready(function() {
-        $('.js-example-basic-multiple').select2();
-    });
     let coordinatesString = $('#mapdata').val();
     var coordinatesArray = coordinatesString.split(', ');
 

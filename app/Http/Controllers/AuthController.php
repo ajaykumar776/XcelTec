@@ -20,7 +20,7 @@ class AuthController extends Controller
                     'email' => 'Please Enter Valid Email',
                     'pass' => 'Please Enter Valid Password',
                 ];
-                return view('login')->withErrors($errors);
+                return view('auth/login')->withErrors($errors);
             } else {
                 $token = Str::random(200);
                 $request->session()->put('token', $token);
@@ -41,7 +41,7 @@ class AuthController extends Controller
                 'email' => 'Email is required',
                 'pass' => 'Password is required',
             ];
-            return view('login')->withErrors($errors);
+            return view('auth/login')->withErrors($errors);
         }
     }
 
@@ -51,7 +51,7 @@ class AuthController extends Controller
         if ($tokens) {
             return redirect()->route('dashboard');
         } else {
-            return view('login');
+            return view('auth/login');
         }
     }
 

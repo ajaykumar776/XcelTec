@@ -14,15 +14,12 @@
                         <span class="text-danger">{{ $message }}</span>
                     </div>
                     @enderror
-                    <div class="">
-                        <a class="btn btn-primary" href="{{ route('register') }}">Add User</a>
-                    </div>
                 </div>
             </div>
 
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-centered mb-0" id="">
+                    <table class="table table-bordered table-centered mb-0" id="example">
                         <thead>
                             <tr>
                                 <th>First Name</th>
