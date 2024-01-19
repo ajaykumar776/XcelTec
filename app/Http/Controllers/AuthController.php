@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\UserModel;
+use App\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -16,7 +14,7 @@ class AuthController extends Controller
         $pass = $request->input('pass');
 
         if ($email && $pass) {
-            $check = UserModel::verifyEmailPass($email, $pass);
+            $check = User::verifyEmailPass($email, $pass);
             if (!$check) {
                 $errors = [
                     'email' => 'Please Enter Valid Email',
@@ -24,19 +22,18 @@ class AuthController extends Controller
                 ];
                 return view('login')->withErrors($errors);
             } else {
-                if (Auth::attempt(['email' => $email, 'password' => $pass])) {
-                    $user = Auth::user();
-                    $auth_type = $user->user_type;
-                    $token = Str::random(200);
-                    UserModel::where('email', $email)->update(['tokens' => $token]);
-                    $request->session()->put('token', $token);
-                    $request->session()->put('user_type', $auth_type);
-                    return redirect()->route('dashboard');
+                $token = Str::random(200);
+                $request->session()->put('token', $token);
+                if ($email != "admin@gmail.com") {
+                    $user = User::getUserByEmailId($email);
+                    $request->session()->put('first_name', $user->first_name);
+                    $request->session()->put('last_name', $user->last_name);
+                    $request->session()->put('user_type', "user");
+                    $request->session()->put('user_id', $user->id);
+                    return redirect()->route('user_dashboard');
                 } else {
-                    $errors = [
-                        'email' => 'Authentication failed. Please check your credentials.',
-                    ];
-                    return view('login')->withErrors($errors);
+                    $request->session()->put('user_type', "admin");
+                    return redirect()->route('dashboard');
                 }
             }
         } else {
@@ -47,48 +44,6 @@ class AuthController extends Controller
             return view('login')->withErrors($errors);
         }
     }
-
-    public function APILogin(Request $request)
-    {
-
-        // $token = Auth::user()->token ?? '';
-
-        // if ($token) {
-        //     return response()->json(['message' => 'You have Already LoggedIn'], 200);
-        // }
-        $email = $request->input('email');
-        $pass = $request->input('pass');
-
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'pass' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            return response()->json(['message' => $errors->first()], 422);
-        }
-
-        $check = UserModel::verifyEmailPass($email, $pass);
-        if (!$check) {
-            return response()->json(['message' => 'Invalid email or password'], 401);
-        }
-        $token = Str::random(200);
-        if (Auth::attempt(['email' => $email, 'password' => $pass])) {
-            $user = Auth::user();
-            $auth_type = $user->user_type;
-            UserModel::where('email', $email)->update(['tokens' => $token]);
-            return response()->json([
-                'message' => 'Login successful',
-                'token' => $token,
-                'user_type' => $auth_type,
-            ], 200);
-        }
-
-        return response()->json(['message' => 'Authentication failed. Please check your credentials.'], 401);
-    }
-
-
 
     public function Login(Request $request)
     {
@@ -102,12 +57,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $id = Auth::user()->id;
-        $user = UserModel::find($id);
-        $user->update(['tokens' => '']);
-        $request->session()->forget('token');
-        Auth::logout();
-        $request->session()->forget('token');
+        $request->session()->flush();
         return redirect()->route('login');
     }
 }

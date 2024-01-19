@@ -15,27 +15,16 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('first_name'); // Add first name
+            $table->string('last_name');  // Add last name
             $table->string('email')->unique();
-            $table->string('password');
+            $table->string('password', 255); // Increase the length to 255 characters
             $table->string('phone')->unique();
-            $table->string('otp')->nullable();
-            $table->enum('user_type', ['Admin', 'User'])->default('Admin');
-            $table->boolean('email_verified')->default(false);
-            $table->boolean('otp_verified')->default(false);
-            $table->string('tokens')->nullable();
-            $table->unsignedBigInteger('address_id')->nullable();
-            $table->boolean('is_deleted')->default(false);
-
-            // Add the new columns for country, state, and city IDs
-            $table->unsignedBigInteger('country_id')->nullable();
-            $table->unsignedBigInteger('state_id')->nullable();
-            $table->unsignedBigInteger('city_id')->nullable();
-
+            $table->text('map_details')->nullable();    // Add map_details as a text column
             $table->timestamps();
-            $table->softDeletes();
         });
     }
+
 
     /**
      * Reverse the migrations.

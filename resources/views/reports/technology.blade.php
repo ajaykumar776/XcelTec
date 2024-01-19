@@ -7,40 +7,32 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="">
-                        UsersList
+                        <h1>Technology Report</h1>
                     </div>
                     @error('error')
                     <div class="">
-                        <span class="text-danger">{{ $message }}</span>
+                        <span class="text-danger">{{ $message ?? "" }}</span>
                     </div>
                     @enderror
-                    <div class="">
-                        <a class="btn btn-primary" href="{{ route('register') }}">Add User</a>
-                    </div>
                 </div>
             </div>
 
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-centered mb-0" id="">
+                    <table class="table table-bordered table-centered mb-0" id="technology">
                         <thead>
                             <tr>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
+                                <th>Technology</th>
+                                <th>Client</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($lists as $user)
+                            @foreach ($technologyReport as $data)
                             <tr>
-                                <td>{{ $user['first_name'] }}</td>
-                                <td>{{ $user['last_name'] }}</td>
-                                <td>{{ $user['email'] }}</td>
-                                <td>{{ $user['phone'] }}</td>
+                                <td>{{ $data['name'] }}</td>
+                                <td>{{ $data['users_count'] }}</td>
                             </tr>
                             @endforeach
-
                         </tbody>
                     </table>
                 </div>
@@ -50,6 +42,6 @@
 
 </div>
 <script>
-    new DataTable('#example');
+    new DataTable('#technology');
 </script>
 @endsection

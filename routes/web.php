@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\userListController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,16 +17,15 @@ use App\Http\Controllers\userListController;
 */
 
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/users', [userListController::class, 'index'])->name('dashboard');
-    Route::get('user/create', [userListController::class, 'create'])->name('register');
-    Route::post('user/save', [userListController::class, 'store'])->name('usersave');
-    Route::get('/users/edit/{id}', [userListController::class, 'edit'])->name('userEdit');
-    Route::get('/users/delete/{id}', [userListController::class, 'destroy'])->name('userDelete');
-    Route::get('/user/otp/verification', [userListController::class, 'OtpPage'])->name('otpVerificationPage');
-    Route::post('/verification', [userListController::class, 'OtpVerification'])->name('otpverification');
+Route::middleware(['middleware' => 'session'])->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('dashboard')->middleware('user_type');
+    Route::get('/user-dashboard', [UserController::class, 'UserDashboard'])->name('user_dashboard');
+    Route::get('/users/edit/{id}', [UserController::class, 'edit'])->name('userEdit');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/registration-report', 'ReportController@registrationReport')->name('registration');
+    Route::get('/technology-report', 'ReportController@technologyReport')->name('technology');
 });
-
+Route::get('user/create', [UserController::class, 'create'])->name('register');
+Route::post('user/save', [UserController::class, 'store'])->name('usersave');
 Route::match(['get'], '/{login?}', [AuthController::class, 'Login'])->name('login');
 Route::post('/login/save', [AuthController::class, 'LoginSave'])->name('loginsave');

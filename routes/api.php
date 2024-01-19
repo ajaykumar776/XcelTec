@@ -15,13 +15,3 @@ use App\Http\Controllers\userListController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-
-// Protected route - requires authentication
-Route::middleware('auth:api')->group(function () {
-    Route::post('user/save/', [userListController::class, 'StoreSave']);
-    Route::post('otp/verification', [userListController::class, 'OtpverificationByApi']);
-});
-Route::post('/login', [AuthController::class, 'APILogin'])->name('api.login');
-Route::get('/getCities/{stateId}', [userListController::class, 'getAllCities']);
-Route::get('/getStates/{country_id}', [userListController::class, 'getAllStates']);

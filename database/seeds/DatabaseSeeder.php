@@ -13,16 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
-            'name' => 'SuperAdmin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('123456'), // Hash the password using the Hash facade
-            'phone' => 7781031768, // Increment the phone number for each user
-            'user_type' => 'Admin',
-            'email_verified' => true,
-            'otp_verified' => true,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $this->call(UserSeeder::class);
+        $this->call(TechnologySeeder::class);
+        $this->call(SourceSeeder::class);
     }
 }

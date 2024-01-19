@@ -63,12 +63,13 @@ $addresses = $addresses ?? null;
                         <input type="text" name="user_id" hidden value="{{$data['id'] ?? ''}}">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="name" class="form-label">Name</label>
-                                <input required type="text" id="name" class="form-control" name="name" value="{{ old('name', $data['name'] ?? '') }}">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input required type="text" id="first_name" class="form-control" name="first_name" value="{{ old('first_name', $data['first_name'] ?? '') }}">
                                 @error('name')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
+
 
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
@@ -77,11 +78,6 @@ $addresses = $addresses ?? null;
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
-
-
-                        </div>
-                        <div class="col-md-6">
-
                             <div class="mb-3">
                                 <label for="contact" class="form-label">Contact</label>
                                 <input required type="contact" id="contact" name="phone" class="form-control" value="{{ old('phone', $data['phone'] ?? '') }}">
@@ -89,6 +85,19 @@ $addresses = $addresses ?? null;
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
+                            <div class="mb-3">
+                                <div id="map" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Last Name</label>
+                                <input required type="text" id="last_name" class="form-control" name="last_name" value="{{ old('last_name', $data['last_name'] ?? '') }}">
+                                @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
                             @if($col_pass)
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
@@ -98,163 +107,54 @@ $addresses = $addresses ?? null;
                                 @enderror
                             </div>
                             @endif
+                            @if($col_source)
                             <div class="mb-3">
-                                <label>User Type:</label>
-                                <div class="form-check form-check-inline">
-                                    <input required class="form-check-input" type="radio" id="userTypeUser" name="user_type" value="User" {{ (old('user_type', $data['user_type'] ?? '') === 'User') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="userTypeUser">User</label>
+                                <label>How did you hear about us?</label>
+                                <?php $count = 0; ?>
+                                @foreach($sources as $index=> $source)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="source{{$source->id}}" name="sources[]" value="{{$source->id}}" <?php echo isset($data['sources'][$index]) ? (($data['sources'][$index]->id == $source->id) ? "checked" : "") : ""  ?>>
+                                    <label class="form-check-label" for="source{{$source->id}}">{{$source->name}}</label>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input required class="form-check-input" type="radio" id="userTypeAdmin" name="user_type" value="Admin" {{ (old('user_type', $data['user_type'] ?? '') === 'Admin') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="userTypeAdmin">Admin</label>
+                                <?php $count++; ?>
+                                @endforeach
+
+                                @error('sources')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            @endif
+                            @if($col_technology)
+                            <div class="mb-3">
+                                <label>Technology Interested:</label>
+                                <input type="text" hidden value="{{$data['map_details']}}" name="map_details" id="mapdata">
+                                <div class="row">
+                                    <?php $count = 0; ?>
+                                    @foreach($technology as $index => $source)
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="source{{$source->id}}" name="technology[]" value="{{$source->id}}" <?php echo isset($data['technologies'][$index]) ? (($data['technologies'][$index]->id == $source->id) ? "checked" : "") : ""  ?>>
+                                            <label class="form-check-label" for="source{{$source->id}}">{{$source->name}}</label>
+                                        </div>
+                                    </div>
+
+                                    <?php
+                                    $count++;
+                                    if ($count % 10 == 0) {
+                                        // Close the current row and start a new one
+                                        echo '</div><div class="row">';
+                                    }
+                                    ?>
+                                    @endforeach
+                                </div>
+                                @endif
+
+                                <div class="mt-3">
+                                    <button type="submit" class="btn btn-primary" style="width: 20%; float:right;">{{$title}}</button>
                                 </div>
                             </div>
-                            @error('user_type')
-                            <small class="text-danger">{{ $message }}</small>
-                            @enderror
                         </div>
                     </div>
-                    <div class="row justify-content mt-5">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    Address Form
-                                </div>
-                                <div class="card-body" id="main_div">
-                                    @if($addresses !==null)
-                                    @foreach ($addresses as $index => $address)
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="country">Country</label>
-                                                <select required class="form-control" id="country_{{ $index }}" onchange="loadState(this.id,this.value)" name="country_id[]">
-                                                    <option value="">Select Country</option>
-                                                    <!-- Populate country dropdown dynamically -->
-                                                    @foreach ($countries as $country)
-                                                    <option value="{{ $country['id'] }}" @if (old('country_id.'.$index, $address['country'])==$country['id']) selected @endif>
-                                                        {{ $country['name'] }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-                                                @error('country_id.*')
-                                                <small class="text-danger">{{ $message }}</small>
-                                                @enderror
-
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="state">State</label>
-                                                <select required class="form-control" id="state_{{ $index }}" name="state_id[]" onchange="loadCity(this.id,this.value)">
-                                                    <option value="">Select State</option>
-                                                    @foreach ($states as $state)
-                                                    <option value="{{ $state['id'] }}" @if (old('state_id.'.$index, $address['state'])==$state['id']) selected @endif>
-                                                        {{ $state['name'] }}
-                                                    </option>
-                                                    @endforeach
-                                                    @error('state_id.*')
-                                                    <small class="text-danger">{{ $message }}</small>
-                                                    @enderror
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="city">City</label>
-                                                <select required class="form-control" name="city_id[]" id="city_{{ $index }}">
-                                                    <option value="">Select City</option>
-                                                    @foreach ($cities as $city)
-                                                    <option value="{{ $city['id'] }}" @if (old('city_id.'.$index, $address['city'])==$city['id']) selected @endif>
-                                                        {{ $city['name'] }}
-                                                    </option>
-                                                    @endforeach
-                                                    <!-- Cities will be populated dynamically based on selected state -->
-                                                </select>
-                                                @error('city_id.*')
-                                                <small class="text-danger">{{ $message }}</small>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-md-1 btn-center">
-                                            <!-- The "+" button should only be shown for the first address row -->
-                                            @if ($index === 0)
-                                            <button type="button" class="btn btn-primary clone-btn">+</button>
-                                            @else
-                                            <!-- Show "Remove" button for all other address rows -->
-                                            <button type="button" class="btn btn-danger remove-btn">-</button>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                    @endif
-                                    @if($addresses ==null)
-                                    <div class="row default">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="country">Country</label>
-                                                <select required class="form-control" id="country_0" onchange="loadState(this.id,this.value)" name="country_id[]">
-                                                    <option value="">Select Country</option>
-                                                    <!-- Populate country dropdown dynamically -->
-                                                    @foreach ($countries as $country)
-                                                    <option value="{{ $country['id'] }}" @if (old('country_id', $address['country'] ?? '' )==$country['id']) selected @endif>
-                                                        {{ $country['name'] }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-                                                @error('country_id.*')
-                                                <small class="text-danger">{{ $message }}</small>
-                                                @enderror
-
-                                            </div>
-
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="state">State</label>
-                                                <select required class="form-control" id="state_0" name="state_id[]" onchange="loadCity(this.id,this.value)">
-                                                    <option value="">Select State</option>
-                                                    @foreach ($states as $state)
-                                                    <option value="{{ $state['id'] }}" @if (old('state_id', $address['state'] ?? '' )==$state['id']) selected @endif>
-                                                        {{ $state['name'] }}
-                                                    </option>
-                                                    @endforeach
-                                                    <!-- States will be populated dynamically based on selected country -->
-                                                </select>
-                                                @error('state_id.*')
-                                                <small class="text-danger">{{ $message }}</small>
-                                                @enderror
-                                            </div>
-
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="city">City</label>
-                                                <select required class="form-control" name="city_id[]" id="city_0">
-                                                    <option value="">Select City</option>
-                                                    @foreach ($cities as $city)
-                                                    <option value="{{ $city['id'] }}" @if (old('city_id', $address['city'] ?? '' )==$city['id']) selected @endif>
-                                                        {{ $city['name'] }}
-                                                    </option>
-                                                    @endforeach
-                                                    <!-- Cities will be populated dynamically based on selected state -->
-                                                </select>
-                                                @error('city_id.*')
-                                                <small class="text-danger">{{ $message }}</small>
-                                                @enderror
-                                            </div>
-
-                                        </div>
-                                        <div class="col-md-1 btn-center">
-                                            <button type="button" class="btn btn-primary clone-btn">+</button>
-                                        </div>
-                                    </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <button type="submit" class="btn btn-primary" style="width: 20%; float:right;">{{$title}}</button>
-                        </div>
                 </form>
             </div>
         </div>
@@ -262,31 +162,28 @@ $addresses = $addresses ?? null;
 </div>
 <script>
     $(document).ready(function() {
-        var counter = <?php echo count($addresses ?? []) ?? 0 ?>
-        // Cloning row on "+" button click
-        $(document).on("click", ".clone-btn", function() {
-            var lastRow = $('#main_div').find('.row').last();
-            var clonedRow = lastRow.clone();
-            counter++;
+        $('.js-example-basic-multiple').select2();
+    });
+    let coordinatesString = $('#mapdata').val();
+    var coordinatesArray = coordinatesString.split(', ');
 
-            clonedRow.find("select").val(""); // Reset select values in cloned row
-            clonedRow.find(".clone-btn").removeClass("clone-btn btn-primary").addClass("remove-btn btn-danger").text("-");
+    var latitude = parseFloat(coordinatesArray[0]);
+    var longitude = parseFloat(coordinatesArray[1]);
 
-            // Update the IDs of the select tags
-            clonedRow.find("select").each(function() {
-                var oldId = $(this).attr("id");
-                var prefix = oldId.split("_")[0]; // Get the prefix, e.g., "country"
-                var newId = prefix + "_" + counter; // Append the counter to form the new ID
-                $(this).attr("id", newId);
-            });
+    var map = L.map('map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-            clonedRow.insertAfter(lastRow);
-        });
-
-        // Removing row on "-" button click
-        $(document).on("click", ".remove-btn", function() {
-            $(this).closest(".row").remove();
-        });
+    var marker = coordinatesString ? L.marker([latitude, longitude]).addTo(map) : "";
+    map.on('click', function(e) {
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        marker = L.marker(e.latlng).addTo(map);
+        console.log(marker);
+        let data = e.latlng.lat + ' , ' + e.latlng.lng;
+        $('#mapdata').val(data);
     });
 </script>
 @endsection
