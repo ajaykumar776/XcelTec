@@ -26,6 +26,7 @@
                                 <th>Last Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
+                                <th>Sources</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -35,8 +36,16 @@
                                 <td>{{ $user['last_name'] }}</td>
                                 <td>{{ $user['email'] }}</td>
                                 <td>{{ $user['phone'] }}</td>
+                                <td>
+                                    @if(count($user['sources']) > 0)
+                                    @foreach($user['sources'] as $source)
+                                    <span class="badge bg-primary">{{ $source->name }}</span>
+                                    @endforeach
+                                    @endif
+                                </td>
                             </tr>
                             @endforeach
+
 
                         </tbody>
                     </table>

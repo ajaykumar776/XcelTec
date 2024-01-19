@@ -1,56 +1,33 @@
-function fetchStates(id, countryId) {
-    $.ajax({
-        url: `/api/getStates/${countryId}`,
-        method: 'GET',
-        success: function (response) {
-            response = response.states;
-            const stateDropdown = $('#state_' + id);
-            console.log()
-            stateDropdown.empty().prop('disabled', false);
-            stateDropdown.append('<option value="">Select State</option>');
-            const stateOptions = response.map(state => `<option value="${state.id}">${state.name}</option>`);
-            stateDropdown.append(stateOptions);
-        },
-        error: function (error) {
-            console.error('Error fetching states:', error);
-        }
+function initializeMap(users) {
+    var map = L.map('map');
+    var totalLatitude = 0;
+    var totalLongitude = 0;
+
+    users.forEach(function (user) {
+        var coordinates = user.map_details.split(',');
+        totalLatitude += parseFloat(coordinates[0]);
+        totalLongitude += parseFloat(coordinates[1]);
     });
-}
 
+    var avgLatitude = totalLatitude / users.length;
+    var avgLongitude = totalLongitude / users.length;
 
+    map.setView([avgLatitude, avgLongitude], 13);
 
-// Function to fetch cities based on selected state
-function fetchCities(id, stateId) {
-    $.ajax({
-        url: `/api/getCities/${stateId}`, // Replace with the actual URL for fetching cities
-        method: 'GET',
-        success: function (response) {
-            response = response.cities;
-            const cityDropdown = $('#city_' + id);
-            cityDropdown.empty().prop('disabled', false);
-            cityDropdown.append('<option value="">Select City</option>');
-            response.forEach(city => {
-                cityDropdown.append(`<option value="${city.id}">${city.name}</option>`);
-            });
-        },
-        error: function (error) {
-            console.error('Error fetching cities:', error);
-        }
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    users.forEach(function (user) {
+        var coordinates = user.map_details.split(',');
+        var firstName = user.first_name;
+        var lastName = user.last_name;
+        var phone = user.phone;
+        var email = user.email;
+
+        L.marker([parseFloat(coordinates[0]), parseFloat(coordinates[1])])
+            .addTo(map)
+            .bindPopup(`<b>Name:</b> ${firstName} ${lastName}<br><b>Contact:</b> ${phone}<br><b>Email:</b> ${email}`)
+            .openPopup();
     });
-}
-
-// Event handler for country selection
-function loadState(id, value) {
-    var id = id.split("_")[1];
-    if (value) {
-        fetchStates(id, value);
-    }
-}
-
-// Event handler for state selection
-function loadCity(id, value) {
-    var id = id.split("_")[1];
-    if (value) {
-        fetchCities(id, value);
-    }
 }

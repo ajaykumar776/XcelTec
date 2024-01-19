@@ -21,7 +21,7 @@ class ReportController extends Controller
     }
     public function mapReport()
     {
-        $users = User::select('first_name', 'last_name', 'phone', 'map_details')
+        $users = User::select('first_name', 'last_name', 'phone', 'email', 'map_details')
             ->whereNotNull('map_details')
             ->get();
         return view('admin/reports.map', compact('users'));
