@@ -2,6 +2,20 @@
 * Frontend: HTML, CSS, Bootstrap 5, javascript
 * Backend: PHP, Laravel
 * Database: Mysql
+
+
+# Client Features
+* User-login
+* Profile-edit
+* Logout
+
+# Admin Features
+* Admin-login
+* User List
+* Registration Report
+* Technology Report
+* Logout
+
 # Steps to Run The project
 
 Commands : 
